@@ -8,6 +8,3 @@ class TestSum:
 
     def test_sum_negative(self):
         assert SumSolution().compute(-1, -2) == -3
-
-
-
