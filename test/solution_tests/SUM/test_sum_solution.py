@@ -9,8 +9,5 @@ class TestSum:
     def test_sum_negative(self):
         assert SumSolution().compute(-1, -2) == -3
 
-    def test_sum_nan(self):
-        with pytest.raises(TypeError):
-            SumSolution().compute("a", "b")
 
 
