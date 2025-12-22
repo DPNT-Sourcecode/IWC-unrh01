@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import IntEnum
-from pprint import pprint
 
 # LEGACY CODE ASSET
 # RESOLVED on deploy
@@ -106,7 +105,7 @@ class Queue:
 
         for task in tasks:
             metadata = task.metadata
-            metadata.setdefault("priority", Priority.LOW)
+            metadata.setdefault("priority", Priority.NORMAL)
             metadata.setdefault("group_earliest_timestamp", MAX_TIMESTAMP)
 
             key = (task.provider, task.user_id)
@@ -162,14 +161,14 @@ class Queue:
                         ]
                 else:
                     if task.provider == "bank_statements":
+                        print("hello")
                         metadata["priority"] = Priority.LOW
                     else:
                         metadata["priority"] = Priority.NORMAL
             else:
                 metadata["group_earliest_timestamp"] = current_earliest
                 metadata["priority"] = priority_level
-        print("-----unsort------")
-        pprint(self._queue)
+
         self._queue.sort(
             key=lambda i: (
                 self._priority_for_task(i),
@@ -177,8 +176,6 @@ class Queue:
                 self._timestamp_for_task(i),
             )
         )
-        print("-----sort------")
-        pprint(self._queue)
 
         task = self._queue.pop(0)
         return TaskDispatch(
@@ -282,6 +279,7 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
 
 
