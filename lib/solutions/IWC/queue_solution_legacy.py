@@ -101,11 +101,9 @@ class Queue:
         tasks = [*self._collect_dependencies(item), item]
 
         existing_tasks = {(t.provider, t.user_id) for t in self._queue}
-        print(f"existing tasks: {existing_tasks}")
 
         for task in tasks:
             key = (task.provider, task.user_id)
-            print(f"key: {key}")
             if key in existing_tasks:
                 continue
 
@@ -113,7 +111,6 @@ class Queue:
             metadata.setdefault("priority", Priority.NORMAL)
             metadata.setdefault("group_earliest_timestamp", MAX_TIMESTAMP)
             self._queue.append(task)
-        # print(self._queue)
         return self.size
 
     def dequeue(self):
@@ -263,5 +260,6 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
 
