@@ -103,15 +103,23 @@ class Queue:
         existing_tasks = {(t.provider, t.user_id): i for i, t in enumerate(self._queue)}
 
         for task in tasks:
-            key = (task.provider, task.user_id)
-            if key in existing_tasks:
-                existing_tasks[key] = len(self._queue)
-                continue
-
             metadata = task.metadata
             metadata.setdefault("priority", Priority.NORMAL)
             metadata.setdefault("group_earliest_timestamp", MAX_TIMESTAMP)
-            self._queue.append(task)
+
+            key = (task.provider, task.user_id)
+
+            if key not in existing_tasks:
+                existing_tasks[key] = len(self._queue)
+                self._queue.append(task)
+                continue
+
+            existing_task = self._queue[existing_tasks[key]]
+
+            if task.timestamp < existing_task.timestamp:
+                self._queue[existing_tasks[key]] = task
+
+        print(f"que : {self._queue}")
         return self.size
 
     def dequeue(self):
@@ -261,4 +269,5 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
