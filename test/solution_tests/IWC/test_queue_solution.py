@@ -110,5 +110,3 @@ def test_enqueue_bank_statements_deployed_2() -> None:
             call_dequeue().expect("companies_house", 2),
         ]
     )
-
-
