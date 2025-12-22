@@ -59,19 +59,6 @@ def test_enqueue_dependency_resolution() -> None:
 def test_enqueue_deduplication() -> None:
     run_queue(
         [
-            call_enqueue("companies_house", 1, iso_ts(delta_minutes=0)).expect(1),
-            call_enqueue("companies_house", 1, iso_ts(delta_minutes=5)).expect(1),
-            call_enqueue("id_verification", 1, iso_ts(delta_minutes=2)).expect(2),
-            call_size().expect(2),
-            call_dequeue().expect("companies_house", 1),
-            call_dequeue().expect("id_verification", 1),
-        ]
-    )
-
-
-def test_enqueue_deployed() -> None:
-    run_queue(
-        [
             call_enqueue("companies_house", 1, iso_ts(delta_minutes=2)).expect(1),
             call_enqueue("id_verification", 1, iso_ts(delta_minutes=4)).expect(2),
             call_enqueue("credit_check", 1, iso_ts(delta_minutes=0)).expect(3),
@@ -80,5 +67,19 @@ def test_enqueue_deployed() -> None:
             call_dequeue().expect("id_verification", 1),
         ]
     )
+
+
+def test_enqueue_bank_statements_deprioritised() -> None:
+    run_queue(
+        [
+            call_enqueue("companies_house", 1, iso_ts(delta_minutes=2)).expect(1),
+            call_enqueue("bank_statements", 1, iso_ts(delta_minutes=0)).expect(2),
+            call_enqueue("id_verification", 1, iso_ts(delta_minutes=5)).expect(3),
+            call_dequeue().expect("companies_house", 1),
+            call_dequeue().expect("id_verification", 1),
+            call_dequeue().expect("bank_statements", 1),
+        ]
+    )
+
 
 
