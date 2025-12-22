@@ -119,7 +119,6 @@ class Queue:
             if task.timestamp < existing_task.timestamp:
                 self._queue[existing_tasks[key]] = task
 
-        print(f"que : {self._queue}")
         return self.size
 
     def dequeue(self):
@@ -269,5 +268,6 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
 
