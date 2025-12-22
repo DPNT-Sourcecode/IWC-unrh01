@@ -100,11 +100,12 @@ class Queue:
     def enqueue(self, item: TaskSubmission) -> int:
         tasks = [*self._collect_dependencies(item), item]
 
-        existing_tasks = {(t.provider, t.user_id) for t in self._queue}
+        existing_tasks = {(t.provider, t.user_id): i for i, t in enumerate(self._queue)}
 
         for task in tasks:
             key = (task.provider, task.user_id)
             if key in existing_tasks:
+                existing_tasks[key] = len(self._queue)
                 continue
 
             metadata = task.metadata
@@ -260,3 +261,4 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
