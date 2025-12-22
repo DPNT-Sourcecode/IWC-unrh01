@@ -91,8 +91,8 @@ def test_enqueue_bank_statements_deployed_1() -> None:
             call_enqueue("companies_house", 2, iso_ts(delta_minutes=0)).expect(4),
             call_dequeue().expect("id_verification", 1),
             call_dequeue().expect("companies_house", 1),
-            call_dequeue().expect("companies_house", 2),
             call_dequeue().expect("bank_statements", 1),
+            call_dequeue().expect("companies_house", 2),
         ]
     )
 
@@ -106,12 +106,7 @@ def test_enqueue_bank_statements_deployed_2() -> None:
             call_enqueue("companies_house", 2, iso_ts(delta_minutes=0)).expect(4),
             call_dequeue().expect("id_verification", 1),
             call_dequeue().expect("companies_house", 1),
-            call_dequeue().expect("companies_house", 2),
             call_dequeue().expect("bank_statements", 1),
+            call_dequeue().expect("companies_house", 2),
         ]
     )
-
-
-
-
-
