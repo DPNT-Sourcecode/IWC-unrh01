@@ -21,7 +21,32 @@ def test_enqueue_rule_of_three() -> None:
             call_enqueue("id_verification", 1, iso_ts(delta_minutes=3)).expect(3),
             call_enqueue("something_else", 1, iso_ts(delta_minutes=3)).expect(4),
             call_enqueue("id_verification", 2, iso_ts(delta_minutes=3)).expect(5),
+            call_size().expect(5),
+            call_dequeue().expect("companies_house", 1),
+            call_dequeue().expect("id_verification", 1),
+            call_dequeue().expect("something_else", 1),
+            call_dequeue().expect("bank_statements", 2),
+            call_dequeue().expect("id_verification", 2),
         ]
     )
+
+
+def test_enqueue_timestamp_ordering() -> None:
+    run_queue(
+        [
+            call_enqueue("companies_house", 1, iso_ts(delta_minutes=3)).expect(1),
+            call_enqueue("bank_statements", 2, iso_ts(delta_minutes=3)).expect(2),
+            call_enqueue("id_verification", 1, iso_ts(delta_minutes=3)).expect(3),
+            call_enqueue("something_else", 1, iso_ts(delta_minutes=3)).expect(4),
+            call_enqueue("id_verification", 2, iso_ts(delta_minutes=3)).expect(5),
+            call_size().expect(5),
+            call_dequeue().expect("companies_house", 1),
+            call_dequeue().expect("id_verification", 1),
+            call_dequeue().expect("something_else", 1),
+            call_dequeue().expect("bank_statements", 2),
+            call_dequeue().expect("id_verification", 2),
+        ]
+    )
+
 
 
