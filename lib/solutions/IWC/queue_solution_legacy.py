@@ -12,6 +12,7 @@ class Priority(IntEnum):
 
     HIGH = 1
     NORMAL = 2
+    LOW = 3
 
 
 @dataclass
@@ -104,7 +105,14 @@ class Queue:
 
         for task in tasks:
             metadata = task.metadata
-            metadata.setdefault("priority", Priority.NORMAL)
+
+            if (
+                task.provider == "bank_statements"
+            ):  # deprioritise when rule of three is not in play
+                metadata.setdefault("priority", Priority.LOW)
+            else:
+                metadata.setdefault("priority", Priority.NORMAL)
+
             metadata.setdefault("group_earliest_timestamp", MAX_TIMESTAMP)
 
             key = (task.provider, task.user_id)
@@ -268,4 +276,5 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
