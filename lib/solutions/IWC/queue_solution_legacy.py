@@ -87,7 +87,10 @@ class Queue:
     @staticmethod
     def _earliest_group_timestamp_for_task(task):
         metadata = task.metadata
-        return metadata.get("group_earliest_timestamp", MAX_TIMESTAMP)
+        value = metadata.get("group_earliest_timestamp", MAX_TIMESTAMP)
+        if isinstance(value, str):
+            return datetime.fromisoformat(value).replace(tzinfo=None)
+        return value
 
     @staticmethod
     def _timestamp_for_task(task):
@@ -184,6 +187,12 @@ class Queue:
 
                         if task_age >= 300:
                             metadata["priority"] = Priority.HIGH
+                            task_dt = datetime.fromisoformat(task.timestamp).replace(
+                                tzinfo=None
+                            )
+                            metadata["group_earliest_timestamp"] = str(
+                                task_dt - timedelta(seconds=1)
+                            )
                         else:
                             metadata["priority"] = Priority.LOW
                     else:
@@ -315,5 +324,6 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
 
