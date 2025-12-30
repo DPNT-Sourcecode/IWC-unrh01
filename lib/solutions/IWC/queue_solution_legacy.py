@@ -129,78 +129,47 @@ class Queue:
         if self.size == 0:
             return None
 
-        newest_timestamp = max(self._timestamp_for_task(t) for t in self._queue)
-        oldest_timestamp = min(self._timestamp_for_task(t) for t in self._queue)
+        # Calculate newest timestamp to determine internal age
+        all_timestamps = [self._timestamp_for_task(t) for t in self._queue]
+        newest_ts = max(all_timestamps)
 
         user_ids = {task.user_id for task in self._queue}
         task_count = {}
         priority_timestamps = {}
         for user_id in user_ids:
             user_tasks = [t for t in self._queue if t.user_id == user_id]
-            earliest_timestamp = sorted(user_tasks, key=lambda t: t.timestamp)[
-                0
-            ].timestamp
-            priority_timestamps[user_id] = earliest_timestamp
+            earliest_ts = min(self._timestamp_for_task(t) for t in user_tasks)
+            priority_timestamps[user_id] = earliest_ts
             task_count[user_id] = len(user_tasks)
 
         for task in self._queue:
+            ts = self._timestamp_for_task(task)
             metadata = task.metadata
-            current_earliest = metadata.get("group_earliest_timestamp", MAX_TIMESTAMP)
-            raw_priority = metadata.get("priority")
-            try:
-                priority_level = Priority(raw_priority)
-            except (TypeError, ValueError):
-                priority_level = None
+            is_bank = task.provider == "bank_statements"
 
-            if priority_level is None or priority_level == Priority.NORMAL:
-                metadata["group_earliest_timestamp"] = MAX_TIMESTAMP
+            # 5-minute age check
+            is_time_sensitive = is_bank and (newest_ts - ts).total_seconds() >= 300
 
-                if task_count[task.user_id] >= 3:
-                    metadata["priority"] = Priority.HIGH
-                    if task.provider == "bank_statements":
-                        task_age = (
-                            newest_timestamp
-                            - datetime.fromisoformat(task.timestamp).replace(
-                                tzinfo=None
-                            )
-                        ).total_seconds()
-                        if task_age > 300:
-                            new_timestamp = datetime.fromisoformat(
-                                priority_timestamps[task.user_id]
-                            )
-                        else:
-                            new_timestamp = datetime.fromisoformat(
-                                priority_timestamps[task.user_id]
-                            ) + timedelta(seconds=1)
-                        metadata["group_earliest_timestamp"] = str(new_timestamp)
-                    else:
-                        metadata["group_earliest_timestamp"] = priority_timestamps[
-                            task.user_id
-                        ]
+            if task_count[task.user_id] >= 3:
+                metadata["priority"] = Priority.HIGH
+                # Deprioritize within the HIGH group unless time-sensitive
+                if is_bank and not is_time_sensitive:
+                    metadata["group_earliest_timestamp"] = priority_timestamps[
+                        task.user_id
+                    ] + timedelta(seconds=1)
                 else:
-                    if task.provider == "bank_statements":
-                        task_age = (
-                            newest_timestamp
-                            - datetime.fromisoformat(task.timestamp).replace(
-                                tzinfo=None
-                            )
-                        ).total_seconds()
-
-                        if task_age >= 300:
-                            metadata["priority"] = Priority.NORMAL
-                            task_ts = self._timestamp_for_task(task)
-
-                            if task_ts <= oldest_timestamp:
-                                metadata["group_earliest_timestamp"] = task_ts
-                            else:
-                                metadata["group_earliest_timestamp"] = MAX_TIMESTAMP
-                        else:
-                            metadata["priority"] = Priority.LOW
-                    else:
-                        metadata["priority"] = Priority.NORMAL
+                    metadata["group_earliest_timestamp"] = priority_timestamps[
+                        task.user_id
+                    ]
             else:
-                metadata["group_earliest_timestamp"] = current_earliest
-                metadata["priority"] = priority_level
+                # Rule of 3 doesn't apply
+                if is_bank and not is_time_sensitive:
+                    metadata["priority"] = Priority.LOW
+                    metadata["group_earliest_timestamp"] = MAX_TIMESTAMP
+                else:
+                    # Time-sensitive bank statements or non-bank tasks
+                    metadata["priority"] = Priority.NORMAL
+                    metadata["group_earliest_timestamp"] = ts
 
         self._queue.sort(
             key=lambda i: (
@@ -211,10 +180,7 @@ class Queue:
         )
 
         task = self._queue.pop(0)
-        return TaskDispatch(
-            provider=task.provider,
-            user_id=task.user_id,
-        )
+        return TaskDispatch(provider=task.provider, user_id=task.user_id)
 
     @property
     def size(self):
@@ -325,6 +291,3 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
-
-
-

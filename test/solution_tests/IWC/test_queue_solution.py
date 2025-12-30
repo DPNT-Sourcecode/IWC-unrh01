@@ -217,5 +217,3 @@ def test_promoted_bank_statement_same_timestamp() -> None:
             call_dequeue().expect("id_verification", 6),
         ]
     )
-
-
