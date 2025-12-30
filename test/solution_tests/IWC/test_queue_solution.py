@@ -112,15 +112,33 @@ def test_enqueue_bank_statements_deployed_2() -> None:
     )
 
 
-def test_age() -> None:
+def test_age_multiple() -> None:
     run_queue(
         [
             call_enqueue("bank_statements", 1, iso_ts(delta_minutes=0)).expect(1),
             call_enqueue("id_verification", 1, iso_ts(delta_minutes=1)).expect(2),
             call_enqueue("companies_house", 1, iso_ts(delta_minutes=2)).expect(3),
             call_enqueue("companies_house", 2, iso_ts(delta_minutes=0)).expect(4),
-            call_age().expect(2),
+            call_age().expect(120),
         ]
     )
+
+
+def test_age_single() -> None:
+    run_queue(
+        [
+            call_enqueue("bank_statements", 1, iso_ts(delta_minutes=0)).expect(1),
+            call_age().expect(0),
+        ]
+    )
+
+
+def test_age_none() -> None:
+    run_queue(
+        [
+            call_age().expect(0),
+        ]
+    )
+
 
 
