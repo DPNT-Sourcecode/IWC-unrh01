@@ -176,13 +176,9 @@ class Queue:
                                 task.user_id
                             ]
                         else:
-                            (
-                                new_timestamp
-                                = datetime.fromisoformat(
-                                    priority_timestamps[task.user_id]
-                                )
-                                + timedelta(seconds=1)
-                            )
+                            new_timestamp = datetime.fromisoformat(
+                                priority_timestamps[task.user_id]
+                            ) + timedelta(seconds=1)
                             metadata["group_earliest_timestamp"] = str(new_timestamp)
                     else:
                         metadata["priority"] = Priority.NORMAL
@@ -313,5 +309,3 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
-
-

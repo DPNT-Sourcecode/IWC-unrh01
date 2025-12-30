@@ -191,8 +191,3 @@ def test_promoted_bank_statement_rule_of_three() -> None:
             call_dequeue().expect("id_verification", 1),
         ]
     )
-
-
-
-
-
