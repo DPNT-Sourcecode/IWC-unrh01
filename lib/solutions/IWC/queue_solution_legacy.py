@@ -189,7 +189,14 @@ class Queue:
 
     @property
     def age(self):
-        return self._queue[0].timestamp - self._queue[len(self._queue) - 1]
+        if len(self._queue) < 0 or len(self._queue) == 1:
+            return 0
+
+        earliest_timestamp = datetime.fromisoformat(self._queue[0].timestamp)
+        oldest_timestamp = datetime.fromisoformat(
+            self._queue[len(self._queue) - 1].timestamp
+        )
+        return earliest_timestamp - oldest_timestamp
 
     def purge(self):
         self._queue.clear()
@@ -279,5 +286,6 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
 
