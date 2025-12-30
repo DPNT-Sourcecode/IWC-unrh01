@@ -202,7 +202,7 @@ class Queue:
         )
 
         delta = earliest_timestamp - oldest_timestamp
-        return delta.total_seconds()
+        return float(delta.total_seconds())
 
     def purge(self):
         self._queue.clear()
@@ -292,6 +292,7 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
 
 
