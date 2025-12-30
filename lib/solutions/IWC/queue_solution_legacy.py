@@ -154,6 +154,13 @@ class Queue:
                     metadata["priority"] = Priority.HIGH
 
                     if task.provider == "bank_statements":
+                        task_age = (
+                            newest_timestamp
+                            - datetime.fromisoformat(task.timestamp).replace(
+                                tzinfo=None
+                            )
+                        ).total_seconds()
+
                         new_timestamp = datetime.fromisoformat(
                             priority_timestamps[task.user_id]
                         ) + timedelta(seconds=1)
@@ -172,14 +179,9 @@ class Queue:
                         ).total_seconds()
 
                         if task_age >= 300:
-                            metadata["group_earliest_timestamp"] = priority_timestamps[
-                                task.user_id
-                            ]
+                            metadata["priority"] = Priority.NORMAL
                         else:
-                            new_timestamp = datetime.fromisoformat(
-                                priority_timestamps[task.user_id]
-                            ) + timedelta(seconds=1)
-                            metadata["group_earliest_timestamp"] = str(new_timestamp)
+                            metadata["priority"] = Priority.LOW
                     else:
                         metadata["priority"] = Priority.NORMAL
             else:
@@ -309,3 +311,4 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
