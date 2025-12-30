@@ -126,6 +126,8 @@ class Queue:
         if self.size == 0:
             return None
 
+        newest_timestamp = max(self._timestamp_for_task(t) for t in self._queue)
+
         user_ids = {task.user_id for task in self._queue}
         task_count = {}
         priority_timestamps = {}
@@ -292,3 +294,4 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
