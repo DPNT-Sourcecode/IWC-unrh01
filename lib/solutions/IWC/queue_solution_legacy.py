@@ -162,16 +162,16 @@ class Queue:
                             )
                         ).total_seconds()
 
-                        new_timestamp = datetime.fromisoformat(
-                            priority_timestamps[task.user_id]
-                        ) + timedelta(seconds=1)
-                        metadata["group_earliest_timestamp"] = str(new_timestamp)
-
                         if task_age >= 300:
-                            metadata["priority"] = Priority.NORMAL
-                            metadata["group_earliest_timestamp"] = priority_timestamps[
-                                task.user_id
-                            ]
+                            new_timestamp = datetime.fromisoformat(
+                                priority_timestamps[task.user_id]
+                            )
+                        else:
+                            new_timestamp = datetime.fromisoformat(
+                                priority_timestamps[task.user_id]
+                            ) + timedelta(seconds=1)
+
+                        metadata["group_earliest_timestamp"] = str(new_timestamp)
                     else:
                         metadata["group_earliest_timestamp"] = priority_timestamps[
                             task.user_id
@@ -318,6 +318,7 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
 
 
