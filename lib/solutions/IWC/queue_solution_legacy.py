@@ -189,8 +189,7 @@ class Queue:
 
     @property
     def age(self):
-        print(self._queue)
-        return 0
+        return self._queue[0].timestamp - self._queue[len(self._queue) - 1]
 
     def purge(self):
         self._queue.clear()
@@ -280,4 +279,5 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 

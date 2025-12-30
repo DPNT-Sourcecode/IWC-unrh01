@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from .utils import call_dequeue, call_enqueue, call_size, iso_ts, run_queue
+from .utils import call_dequeue, call_enqueue, call_size, iso_ts, run_queue, call_age
 
 
 def test_enqueue_size_dequeue_flow() -> None:
@@ -119,7 +119,8 @@ def test_age() -> None:
             call_enqueue("id_verification", 1, iso_ts(delta_minutes=1)).expect(2),
             call_enqueue("companies_house", 1, iso_ts(delta_minutes=2)).expect(3),
             call_enqueue("companies_house", 2, iso_ts(delta_minutes=0)).expect(4),
-            call_age,
+            call_age().expect(2),
         ]
     )
+
 
