@@ -191,7 +191,9 @@ class Queue:
     def age(self):
         if len(self._queue) < 0 or len(self._queue) == 1:
             return 0
+        from pprint import pprint
 
+        pprint(self._queue)
         earliest_timestamp = datetime.fromisoformat(self._queue[0].timestamp)
         print(earliest_timestamp)
         oldest_timestamp = datetime.fromisoformat(
@@ -288,6 +290,7 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
 
 
