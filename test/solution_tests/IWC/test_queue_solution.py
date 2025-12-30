@@ -141,7 +141,7 @@ def test_age_none() -> None:
     )
 
 
-def test_old_bank_statement_priority() -> None:
+def test_fresh_bank_statement_respects_priority() -> None:
     run_queue(
         [
             call_enqueue("bank_statements", 1, iso_ts(delta_minutes=0)).expect(1),
@@ -154,4 +154,6 @@ def test_old_bank_statement_priority() -> None:
             call_dequeue().expect("companies_house", 2),
         ]
     )
+
+def test_
 
