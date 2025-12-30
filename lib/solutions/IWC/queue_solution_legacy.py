@@ -183,13 +183,7 @@ class Queue:
                         ).total_seconds()
 
                         if task_age >= 300:
-                            metadata["priority"] = Priority.NORMAL
-                            task_dt = datetime.fromisoformat(task.timestamp).replace(
-                                tzinfo=None
-                            )
-                            metadata["group_earliest_timestamp"] = str(
-                                task_dt - timedelta(seconds=1)
-                            )
+                            metadata["priority"] = Priority.HIGH
                         else:
                             metadata["priority"] = Priority.LOW
                     else:
@@ -321,4 +315,5 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
