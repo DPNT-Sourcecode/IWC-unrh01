@@ -189,8 +189,7 @@ class Queue:
 
     @property
     def age(self):
-        print("hello")
-        if len(self._queue) < 0 or len(self._queue) == 1:
+        if len(self._queue) < 2:
             return 0
         self._queue.sort(
             key=lambda t: datetime.fromisoformat(t.timestamp), reverse=True
@@ -293,6 +292,7 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
 
 
