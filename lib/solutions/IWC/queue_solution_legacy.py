@@ -193,9 +193,11 @@ class Queue:
             return 0
 
         earliest_timestamp = datetime.fromisoformat(self._queue[0].timestamp)
+        print(earliest_timestamp)
         oldest_timestamp = datetime.fromisoformat(
             self._queue[len(self._queue) - 1].timestamp
         )
+        print(oldest_timestamp)
         return earliest_timestamp - oldest_timestamp
 
     def purge(self):
@@ -286,6 +288,7 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
 
 
