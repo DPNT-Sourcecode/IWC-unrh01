@@ -162,7 +162,6 @@ class Queue:
                         ]
                 else:
                     if task.provider == "bank_statements":
-                        print("hello")
                         metadata["priority"] = Priority.LOW
                     else:
                         metadata["priority"] = Priority.NORMAL
@@ -190,6 +189,7 @@ class Queue:
 
     @property
     def age(self):
+        print(self._queue)
         return 0
 
     def purge(self):
@@ -280,3 +280,4 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
