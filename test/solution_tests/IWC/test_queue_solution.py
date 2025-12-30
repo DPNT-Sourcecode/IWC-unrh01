@@ -154,4 +154,3 @@ def test_old_bank_statement_priority() -> None:
             call_dequeue().expect("companies_house", 2),
         ]
     )
-
