@@ -155,13 +155,28 @@ def test_fresh_bank_statement_respects_priority() -> None:
         ]
     )
 
+
 def test_bank_statement_promoted_after_5_minutes() -> None:
     run_queue(
         [
             call_enqueue("bank_statements", 1, iso_ts(delta_minutes=0)).expect(1),
             call_enqueue("companies_house", 1, iso_ts(delta_minutes=5)).expect(2),
-            call_dequeue().expect("bank_statements", 1)
-            call_dequeue().expect("companies_house", 1)
+            call_dequeue().expect("bank_statements", 1),
+            call_dequeue().expect("companies_house", 1),
         ]
     )
+
+
+def test_promoted_bank_statement_cannot_skip_older_task() -> None:
+    run_queue(
+        [
+            call_enqueue("id_verification", 1, iso_ts(delta_minutes=0)).expect(1),
+            call_enqueue("bank_statements", 2, iso_ts(delta_minutes=1)).expect(2),
+            call_enqueue("companies_house", 1, iso_ts(delta_minutes=6)).expect(3),
+            call_dequeue().expect("companies_house", 1),
+            call_dequeue().expect("bank_statements", 2),
+            call_dequeue().expect("id_verification", 1),
+        ]
+    )
+
 
