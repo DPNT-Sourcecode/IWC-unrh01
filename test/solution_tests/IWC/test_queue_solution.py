@@ -155,5 +155,13 @@ def test_fresh_bank_statement_respects_priority() -> None:
         ]
     )
 
-def test_
+def test_bank_statement_promoted_after_5_minutes() -> None:
+    run_queue(
+        [
+            call_enqueue("bank_statements", 1, iso_ts(delta_minutes=0)).expect(1),
+            call_enqueue("companies_house", 1, iso_ts(delta_minutes=5)).expect(2),
+            call_dequeue().expect("bank_statements", 1)
+            call_dequeue().expect("companies_house", 1)
+        ]
+    )
 
