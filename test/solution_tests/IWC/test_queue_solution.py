@@ -38,9 +38,9 @@ def test_enqueue_timestamp_ordering() -> None:
             call_enqueue("bank_statements", 2, iso_ts(delta_minutes=-5)).expect(2),
             call_enqueue("id_verification", 1, iso_ts(delta_minutes=-2)).expect(3),
             call_size().expect(3),
+            call_dequeue().expect("bank_statements", 2),
             call_dequeue().expect("id_verification", 1),
             call_dequeue().expect("companies_house", 1),
-            call_dequeue().expect("bank_statements", 2),
         ]
     )
 
@@ -154,3 +154,4 @@ def test_old_bank_statement_priority() -> None:
             call_dequeue().expect("companies_house", 2),
         ]
     )
+
